@@ -1,17 +1,42 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setSort } from '../redux/slices/filterSlice';
+
+const list = [
+  { name: 'популярности (DESC)', sortProperty: 'rating' },
+  { name: 'популярности (ASC)', sortProperty: '-rating' },
+  { name: 'цене (DESC)', sortProperty: 'price' },
+  { name: 'цене (ASC)', sortProperty: '-price' },
+  { name: 'алфавиту (DESC)', sortProperty: 'title' },
+  { name: 'алфавиту (ASC)', sortProperty: '-title' },
+];
 
 function Sort() {
-  const [open, setOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState(0);
-  const list = ['популярности', 'цене', 'алфавиту'];
-  const sortName = list[selected];
-  const onClickListItem = index => {
-    setSelected(index);
-    setOpen(false);
+  const dispatch = useDispatch();
+  const sort = useSelector(state => state.filter.sort); // Получаем текущую сортировку из Redux
+  const sortRef = React.useRef();
+
+  const [open, setOpen] = React.useState(false); // Состояние для отслеживания открытия списка сортировки
+
+  const onClickListItem = obj => {
+    dispatch(setSort(obj)); // Передаем выбранную сортировку в Redux
+    setOpen(false); // После этого список сортировки закрывается.
   };
 
+  // Обработчик клика вне списка
+  React.useEffect(() => {
+    const handleClickOutside = event => {
+      if (!event.composedPath().includes(sortRef.current)) {
+        // Проверяем, что клик был не внутри списка
+        setOpen(false);
+      }
+    };
+    document.body.addEventListener('click', handleClickOutside);
+    return () => document.body.removeEventListener('click', handleClickOutside); // Удаляем обработчик события при размонтировании компонента
+  }, []);
+
   return (
-    <div className="sort">
+    <div ref={sortRef} className="sort">
       <div className="sort__label">
         <svg
           width="10"
@@ -26,18 +51,19 @@ function Sort() {
           />
         </svg>
         <b>Сортировка по:</b>
-        <span onClick={() => setOpen(!open)}>{sortName}</span>
+        {/* Отображаем текущий тип сортировки, открываем/закрываем список по клику */}
+        <span onClick={() => setOpen(!open)}>{sort.name}</span>
       </div>
       {open && (
         <div className="sort__popup">
           <ul>
-            {list.map((value, index) => (
+            {list.map((obj, index) => (
               <li
                 key={index}
-                onClick={() => onClickListItem(index)}
-                className={selected === index ? 'active' : ''}
+                onClick={() => onClickListItem(obj)}
+                className={sort.sortProperty === obj.sortProperty ? 'active' : ''} // Подсветка активного элемента
               >
-                {value}
+                {obj.name}
               </li>
             ))}
           </ul>
