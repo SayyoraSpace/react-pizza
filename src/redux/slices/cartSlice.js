@@ -35,15 +35,22 @@ const cartSlice = createSlice({
       }
     },
 
+    // удаляем товар
     removeItem(state, action) {
-      state.items = state.items.filter(obj => obj.id !== action.payload); // удаляем товар
+      state.items = state.items.filter(obj => obj.id !== action.payload);
     },
+
+    // очистка корзины
     clearItem(state) {
-      state.items = []; // очистка корзины
+      state.items = [];
       state.totalPrice = 0;
     },
   },
 });
+
+export const selectCart = state => state.cart;
+
+export const selectCartItemById = id => state => state.cart.items.find(obj => obj.id === id);
 
 export const { addItem, removeItem, minusItem, clearItem } = cartSlice.actions;
 

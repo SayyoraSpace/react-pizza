@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSort } from '../redux/slices/filterSlice';
+import { selectSort, setSort } from '../redux/slices/filterSlice';
 
 const list = [
   { name: 'популярности (DESC)', sortProperty: 'rating' },
@@ -13,7 +13,7 @@ const list = [
 
 function Sort() {
   const dispatch = useDispatch();
-  const sort = useSelector(state => state.filter.sort); // Получаем текущую сортировку из Redux
+  const sort = useSelector(selectSort); // Получаем текущую сортировку из Redux
   const sortRef = React.useRef();
 
   const [open, setOpen] = React.useState(false); // Состояние для отслеживания открытия списка сортировки
